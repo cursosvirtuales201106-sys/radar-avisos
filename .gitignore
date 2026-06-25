@@ -1,0 +1,24 @@
+# Node / Next
+node_modules
+.next
+out
+.vercel
+
+# Python
+__pycache__
+*.pyc
+.venv
+venv
+env
+
+# Env
+.env
+.env.local
+.env.production
+.env.development
+
+# OS
+.DS_Store
+Thumbs.db
+nota.txt
+tsconfig.json
