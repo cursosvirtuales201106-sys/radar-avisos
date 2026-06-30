@@ -982,3 +982,519 @@ a {
     flex-direction: column;
   }
 }
+/* Publicación de avisos y pago por Yape */
+.publication-notice {
+  margin: 0 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 30px;
+  border: 1px solid #bfdbfe;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #eff6ff, #f8fafc);
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.08);
+}
+
+.notice-kicker {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.publication-notice h2,
+.form-card-title h2,
+.plans-admin-heading h2,
+.payment-card h2 {
+  margin: 0;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+}
+
+.publication-notice p,
+.plans-admin-heading p,
+.payment-card p,
+.contact-qr-card p {
+  margin: 8px 0 0;
+  color: #475569;
+}
+
+.notice-button,
+.whatsapp-contact-button,
+.refresh-plans-button,
+.save-plan-button,
+.plan-admin-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 14px;
+  padding: 13px 18px;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.notice-button:hover,
+.refresh-plans-button:hover,
+.save-plan-button:hover,
+.plan-admin-actions button:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.publicar-hero {
+  margin-bottom: 22px;
+}
+
+.publication-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 28px;
+}
+
+.publication-steps article {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+}
+
+.publication-steps article > span {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 900;
+}
+
+.publication-steps strong {
+  display: block;
+  color: #0f172a;
+}
+
+.publication-steps p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.publicar-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: 26px;
+  padding-bottom: 56px;
+}
+
+.publicar-main {
+  min-width: 0;
+}
+
+.publicar-heading {
+  margin-top: 0;
+}
+
+.plan-public-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.plan-public-card {
+  position: relative;
+  display: flex;
+  min-height: 208px;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 22px;
+  background: #ffffff;
+  color: #0f172a;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.plan-public-card:hover {
+  transform: translateY(-3px);
+  border-color: #93c5fd;
+  box-shadow: 0 18px 35px rgba(37, 99, 235, 0.13);
+}
+
+.plan-public-card.selected {
+  border-color: #2563eb;
+  box-shadow: 0 18px 35px rgba(37, 99, 235, 0.2);
+}
+
+.plan-public-card.featured {
+  border-color: #f59e0b;
+}
+
+.plan-label {
+  display: inline-flex;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.plan-public-card h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.plan-price {
+  display: block;
+  margin-top: 16px;
+  color: #2563eb;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.plan-duration {
+  display: block;
+  margin-top: 9px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.plan-select-text {
+  margin-top: auto;
+  padding-top: 18px;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.publicar-form {
+  margin-top: 0;
+}
+
+.form-card-title,
+.plans-admin-heading,
+.plan-admin-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.form-card-title {
+  margin-bottom: 22px;
+}
+
+.form-card-title h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 21px;
+}
+
+.selected-plan-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.publicar-actions {
+  margin-top: 26px;
+}
+
+.payment-sidebar {
+  position: sticky;
+  top: 22px;
+  display: grid;
+  gap: 16px;
+}
+
+.payment-card,
+.contact-qr-card,
+.plan-new-card,
+.plan-admin-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+}
+
+.payment-card {
+  padding: 24px;
+}
+
+.payment-step {
+  display: inline-flex;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #ede9fe;
+  color: #6d28d9;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.payment-person {
+  margin-top: 20px;
+  border-radius: 16px;
+  padding: 16px;
+  background: #f8fafc;
+}
+
+.payment-person span,
+.payment-person small,
+.payment-total span,
+.payment-total small {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.payment-person strong {
+  display: block;
+  margin: 4px 0;
+  color: #0f172a;
+  font-size: 22px;
+}
+
+.payment-total {
+  margin-top: 14px;
+  border-radius: 16px;
+  padding: 16px;
+  background: #eff6ff;
+}
+
+.payment-total strong {
+  display: block;
+  margin: 4px 0;
+  color: #1d4ed8;
+  font-size: 28px;
+}
+
+.payment-total.muted {
+  background: #f8fafc;
+}
+
+.payment-note {
+  margin-top: 18px !important;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.contact-qr-card {
+  display: grid;
+  justify-items: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.contact-qr-card img {
+  width: 190px;
+  max-width: 100%;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.contact-qr-card strong {
+  display: block;
+  margin-top: 12px;
+  color: #0f172a;
+}
+
+.whatsapp-contact-button {
+  width: 100%;
+  margin-top: 16px;
+  background: #22c55e;
+}
+
+.whatsapp-contact-button:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+}
+
+/* Gestión de planes desde administración */
+.plans-admin-section {
+  display: grid;
+  gap: 20px;
+}
+
+.plans-admin-heading {
+  padding: 4px 2px;
+}
+
+.plans-admin-heading p {
+  max-width: 680px;
+}
+
+.plan-new-card,
+.plan-admin-card {
+  padding: 24px;
+}
+
+.plan-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.plan-admin-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.plan-admin-grid input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 12px 13px;
+  outline: none;
+  font-size: 15px;
+}
+
+.plan-admin-grid input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.plan-admin-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.plan-admin-checks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.plan-admin-checks input {
+  width: 17px;
+  height: 17px;
+}
+
+.plan-admin-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.plans-admin-list {
+  display: grid;
+  gap: 16px;
+}
+
+.plan-admin-card h3 {
+  margin: 9px 0 0;
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.save-plan-button {
+  background: #0f172a;
+}
+
+.save-plan-button:hover {
+  background: #1e293b;
+}
+
+.refresh-plans-button:disabled,
+.save-plan-button:disabled,
+.plan-admin-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 980px) {
+  .publicar-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-sidebar {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .plan-public-grid,
+  .publication-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-admin-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .publication-notice,
+  .form-card-title,
+  .plans-admin-heading,
+  .plan-admin-card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .publication-notice .notice-button,
+  .refresh-plans-button,
+  .save-plan-button {
+    width: 100%;
+  }
+
+  .payment-sidebar,
+  .plan-admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-admin-checks {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .plan-admin-actions {
+    justify-content: stretch;
+  }
+
+  .plan-admin-actions button {
+    width: 100%;
+  }
+}

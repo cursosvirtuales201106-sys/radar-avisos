@@ -14,9 +14,73 @@ import {
   ImportacionResultado,
   importarAvisosCsv,
 } from "@/services/importacion";
-import { Plan, listarPlanes } from "@/services/planes";
+import {
+  actualizarPlan,
+  crearPlan,
+  Plan,
+  PlanPayload,
+  listarPlanes,
+  listarPlanesAdmin,
+} from "@/services/planes";
 
-type TabAdmin = "manual" | "csv" | "denuncias";
+type TabAdmin = "manual" | "csv" | "denuncias" | "planes";
+
+type PlanFormulario = {
+  nombre: string;
+  slug: string;
+  dias_publicacion: string;
+  precio: string;
+  activo: boolean;
+  prioridad: string;
+  es_destacado: boolean;
+  etiqueta: string;
+};
+
+function crearFormularioPlan(plan?: Plan): PlanFormulario {
+  return {
+    nombre: plan?.nombre || "",
+    slug: plan?.slug || "",
+    dias_publicacion: String(plan?.dias_publicacion ?? 10),
+    precio: String(plan?.precio ?? 0),
+    activo: plan?.activo !== false,
+    prioridad: String(plan?.prioridad ?? 0),
+    es_destacado: Boolean(plan?.es_destacado),
+    etiqueta: plan?.etiqueta || "",
+  };
+}
+
+function obtenerPayloadPlan(formulario: PlanFormulario): PlanPayload {
+  const dias = Number(formulario.dias_publicacion);
+  const precio = Number(formulario.precio);
+  const prioridad = Number(formulario.prioridad);
+
+  if (!formulario.nombre.trim()) {
+    throw new Error("El nombre del plan es obligatorio.");
+  }
+
+  if (!Number.isInteger(dias) || dias < 1 || dias > 365) {
+    throw new Error("Los días de publicación deben estar entre 1 y 365.");
+  }
+
+  if (!Number.isFinite(precio) || precio < 0) {
+    throw new Error("Ingresa un precio válido.");
+  }
+
+  if (!Number.isInteger(prioridad) || prioridad < 0) {
+    throw new Error("La prioridad debe ser un número entero igual o mayor a 0.");
+  }
+
+  return {
+    nombre: formulario.nombre.trim(),
+    slug: formulario.slug.trim(),
+    dias_publicacion: dias,
+    precio,
+    activo: formulario.activo,
+    prioridad,
+    es_destacado: formulario.es_destacado,
+    etiqueta: formulario.etiqueta.trim() || null,
+  };
+}
 
 function limpiarTelefono(valor: string) {
   return valor.replace(/\D/g, "");
@@ -28,6 +92,9 @@ export default function AdminPage() {
 
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [planes, setPlanes] = useState<Plan[]>([]);
+  const [planesAdmin, setPlanesAdmin] = useState<Plan[]>([]);
+  const [edicionPlanes, setEdicionPlanes] = useState<Record<string, PlanFormulario>>({});
+  const [nuevoPlan, setNuevoPlan] = useState<PlanFormulario>(crearFormularioPlan());
 
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
@@ -85,6 +152,102 @@ export default function AdminPage() {
     }
 
     return true;
+  }
+
+  async function refrescarPlanesPublicos() {
+    const data = await listarPlanes();
+    setPlanes(data.filter((item) => item.activo !== false));
+  }
+
+  async function cargarPlanesAdministrables() {
+    if (!validarToken()) return;
+
+    try {
+      setCargando(true);
+      const data = await listarPlanesAdmin(adminToken.trim());
+      setPlanesAdmin(data);
+      setEdicionPlanes(
+        data.reduce<Record<string, PlanFormulario>>((acumulado, plan) => {
+          acumulado[plan.id] = crearFormularioPlan(plan);
+          return acumulado;
+        }, {})
+      );
+    } catch (error) {
+      console.error("Error cargando planes:", error);
+      setError(error instanceof Error ? error.message : "No se pudieron cargar los planes.");
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  function actualizarCampoPlan(
+    planId: string,
+    campo: keyof PlanFormulario,
+    valor: string | boolean
+  ) {
+    setEdicionPlanes((actual) => ({
+      ...actual,
+      [planId]: {
+        ...(actual[planId] || crearFormularioPlan()),
+        [campo]: valor,
+      },
+    }));
+  }
+
+  function actualizarCampoNuevoPlan(
+    campo: keyof PlanFormulario,
+    valor: string | boolean
+  ) {
+    setNuevoPlan((actual) => ({ ...actual, [campo]: valor }));
+  }
+
+  async function guardarPlan(planId: string) {
+    limpiarMensajes();
+
+    if (!validarToken()) return;
+
+    const formulario = edicionPlanes[planId];
+
+    if (!formulario) {
+      setError("No se encontró la información del plan.");
+      return;
+    }
+
+    try {
+      const payload = obtenerPayloadPlan(formulario);
+      setCargando(true);
+
+      await actualizarPlan(planId, payload, adminToken.trim());
+      await Promise.all([cargarPlanesAdministrables(), refrescarPlanesPublicos()]);
+      setMensaje("Plan actualizado correctamente.");
+    } catch (error) {
+      console.error("Error actualizando plan:", error);
+      setError(error instanceof Error ? error.message : "No se pudo actualizar el plan.");
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  async function registrarNuevoPlan(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    limpiarMensajes();
+
+    if (!validarToken()) return;
+
+    try {
+      const payload = obtenerPayloadPlan(nuevoPlan);
+      setCargando(true);
+
+      await crearPlan(payload, adminToken.trim());
+      setNuevoPlan(crearFormularioPlan());
+      await Promise.all([cargarPlanesAdministrables(), refrescarPlanesPublicos()]);
+      setMensaje("Plan creado correctamente.");
+    } catch (error) {
+      console.error("Error creando plan:", error);
+      setError(error instanceof Error ? error.message : "No se pudo crear el plan.");
+    } finally {
+      setCargando(false);
+    }
   }
 
   async function publicarAviso(e: FormEvent<HTMLFormElement>) {
@@ -379,6 +542,18 @@ export default function AdminPage() {
                 }}
               >
                 Denuncias
+              </button>
+
+              <button
+                type="button"
+                className={tab === "planes" ? "active" : ""}
+                onClick={() => {
+                  setTab("planes");
+                  limpiarMensajes();
+                  void cargarPlanesAdministrables();
+                }}
+              >
+                Planes y pagos
               </button>
             </div>
 
@@ -724,6 +899,231 @@ alquileres,Alquilo mini departamento,980168122,Mercado Santa Isabel,`}
                   )}
                 </div>
               </div>
+            )}
+
+            {tab === "planes" && (
+              <section className="plans-admin-section">
+                <div className="plans-admin-heading">
+                  <div>
+                    <span className="notice-kicker">Configuración comercial</span>
+                    <h2>Planes de publicación</h2>
+                    <p>
+                      Edita los precios, días de vigencia, prioridad y visibilidad de los
+                      planes que se muestran al público.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className="refresh-plans-button"
+                    onClick={() => void cargarPlanesAdministrables()}
+                    disabled={cargando}
+                  >
+                    {cargando ? "Actualizando..." : "Actualizar lista"}
+                  </button>
+                </div>
+
+                <form className="plan-new-card" onSubmit={registrarNuevoPlan}>
+                  <div className="form-card-title">
+                    <div>
+                      <span className="notice-kicker">Nuevo plan</span>
+                      <h3>Crear un plan de publicación</h3>
+                    </div>
+                  </div>
+
+                  <div className="plan-admin-grid">
+                    <label>
+                      Nombre
+                      <input
+                        type="text"
+                        value={nuevoPlan.nombre}
+                        onChange={(e) => actualizarCampoNuevoPlan("nombre", e.target.value)}
+                        placeholder="Ejemplo: Premium 30 días"
+                      />
+                    </label>
+                    <label>
+                      Slug
+                      <input
+                        type="text"
+                        value={nuevoPlan.slug}
+                        onChange={(e) => actualizarCampoNuevoPlan("slug", e.target.value)}
+                        placeholder="premium-30-dias"
+                      />
+                    </label>
+                    <label>
+                      Días de publicación
+                      <input
+                        type="number"
+                        min="1"
+                        max="365"
+                        value={nuevoPlan.dias_publicacion}
+                        onChange={(e) => actualizarCampoNuevoPlan("dias_publicacion", e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Precio (S/)
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={nuevoPlan.precio}
+                        onChange={(e) => actualizarCampoNuevoPlan("precio", e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Prioridad
+                      <input
+                        type="number"
+                        min="0"
+                        value={nuevoPlan.prioridad}
+                        onChange={(e) => actualizarCampoNuevoPlan("prioridad", e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Etiqueta opcional
+                      <input
+                        type="text"
+                        value={nuevoPlan.etiqueta}
+                        onChange={(e) => actualizarCampoNuevoPlan("etiqueta", e.target.value)}
+                        placeholder="Ejemplo: Más elegido"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="plan-admin-checks">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={nuevoPlan.activo}
+                        onChange={(e) => actualizarCampoNuevoPlan("activo", e.target.checked)}
+                      />
+                      Plan activo y visible al público
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={nuevoPlan.es_destacado}
+                        onChange={(e) => actualizarCampoNuevoPlan("es_destacado", e.target.checked)}
+                      />
+                      Marcar como destacado
+                    </label>
+                  </div>
+
+                  <div className="plan-admin-actions">
+                    <button type="submit" disabled={cargando}>
+                      {cargando ? "Guardando..." : "Crear plan"}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="plans-admin-list">
+                  {planesAdmin.length === 0 ? (
+                    <div className="empty">
+                      Ingresa tu clave y pulsa «Actualizar lista» para administrar los planes.
+                    </div>
+                  ) : (
+                    planesAdmin.map((plan) => {
+                      const formulario = edicionPlanes[plan.id] || crearFormularioPlan(plan);
+
+                      return (
+                        <article className="plan-admin-card" key={plan.id}>
+                          <div className="plan-admin-card-header">
+                            <div>
+                              <span className={`tag ${formulario.activo ? "" : "gray"}`}>
+                                {formulario.activo ? "Activo" : "Oculto"}
+                              </span>
+                              <h3>{plan.nombre}</h3>
+                            </div>
+                            <button
+                              type="button"
+                              className="save-plan-button"
+                              onClick={() => void guardarPlan(plan.id)}
+                              disabled={cargando}
+                            >
+                              Guardar cambios
+                            </button>
+                          </div>
+
+                          <div className="plan-admin-grid">
+                            <label>
+                              Nombre
+                              <input
+                                type="text"
+                                value={formulario.nombre}
+                                onChange={(e) => actualizarCampoPlan(plan.id, "nombre", e.target.value)}
+                              />
+                            </label>
+                            <label>
+                              Slug
+                              <input
+                                type="text"
+                                value={formulario.slug}
+                                onChange={(e) => actualizarCampoPlan(plan.id, "slug", e.target.value)}
+                              />
+                            </label>
+                            <label>
+                              Días de publicación
+                              <input
+                                type="number"
+                                min="1"
+                                max="365"
+                                value={formulario.dias_publicacion}
+                                onChange={(e) => actualizarCampoPlan(plan.id, "dias_publicacion", e.target.value)}
+                              />
+                            </label>
+                            <label>
+                              Precio (S/)
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={formulario.precio}
+                                onChange={(e) => actualizarCampoPlan(plan.id, "precio", e.target.value)}
+                              />
+                            </label>
+                            <label>
+                              Prioridad
+                              <input
+                                type="number"
+                                min="0"
+                                value={formulario.prioridad}
+                                onChange={(e) => actualizarCampoPlan(plan.id, "prioridad", e.target.value)}
+                              />
+                            </label>
+                            <label>
+                              Etiqueta opcional
+                              <input
+                                type="text"
+                                value={formulario.etiqueta}
+                                onChange={(e) => actualizarCampoPlan(plan.id, "etiqueta", e.target.value)}
+                                placeholder="Ejemplo: Más elegido"
+                              />
+                            </label>
+                          </div>
+
+                          <div className="plan-admin-checks">
+                            <label>
+                              <input
+                                type="checkbox"
+                                checked={formulario.activo}
+                                onChange={(e) => actualizarCampoPlan(plan.id, "activo", e.target.checked)}
+                              />
+                              Plan activo y visible al público
+                            </label>
+                            <label>
+                              <input
+                                type="checkbox"
+                                checked={formulario.es_destacado}
+                                onChange={(e) => actualizarCampoPlan(plan.id, "es_destacado", e.target.checked)}
+                              />
+                              Marcar como destacado
+                            </label>
+                          </div>
+                        </article>
+                      );
+                    })
+                  )}
+                </div>
+              </section>
             )}
           </div>
         </section>

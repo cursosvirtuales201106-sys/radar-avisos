@@ -336,7 +336,11 @@ async function enviarDenuncia() {
               </p>
             </div>
 
-          
+            <div className="hero-actions">
+              <a className="publish-button" href="/publicar">
+                Publicar mi aviso
+              </a>
+            </div>
           </div>
           <form className="search-card" onSubmit={buscar}>
             <input
@@ -369,6 +373,21 @@ async function enviarDenuncia() {
 
             <button type="submit">Buscar</button>
           </form>
+        </section>
+
+        <section className="publication-notice" aria-label="Información para publicar avisos">
+          <div>
+            <span className="notice-kicker">¿Tienes algo que anunciar?</span>
+            <h2>Publica alquileres, trabajos, servicios, ventas y mucho más.</h2>
+            <p>
+              Elige un plan, realiza el pago previo por Yape y envía tu comprobante
+              por WhatsApp. Revisaremos la información antes de publicar tu aviso.
+            </p>
+          </div>
+
+          <a className="notice-button" href="/publicar">
+            Ver planes y publicar
+          </a>
         </section>
 
         <section>
